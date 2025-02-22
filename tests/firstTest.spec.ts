@@ -69,7 +69,7 @@ test.skip('location child elements', async ({ page }) => {
   await page.locator('nb-card').nth(3).getByRole('button').click();
 });
 
-test('location parent component', async ({ page }) => {
+test.skip('location parent component', async ({ page }) => {
   await page
     .locator('nb-card', { hasText: 'Using the Grid' })
     .getByRole('textbox', { name: 'Email' })
@@ -104,4 +104,18 @@ test('location parent component', async ({ page }) => {
     .locator('..')
     .getByRole('textbox', { name: 'Email' })
     .click();
+});
+
+test('Reusing locators', async ({ page }) => {
+  const basicForm = page.locator('nb-card').filter({ hasText: 'Basic form' });
+
+  const emailField = basicForm.getByRole('textbox', { name: 'Email' });
+
+  await emailField.fill('example@example.com');
+
+  await basicForm.getByRole('textbox', { name: 'Password' }).fill('Welcome123');
+
+  await basicForm.locator('nb-checkbox').click();
+
+  await basicForm.getByRole('button').click();
 });
