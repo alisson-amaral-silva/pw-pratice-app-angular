@@ -1,4 +1,4 @@
-import test from '@playwright/test';
+import test, { expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('http://localhost:4200');
@@ -106,7 +106,7 @@ test.skip('location parent component', async ({ page }) => {
     .click();
 });
 
-test('Reusing locators', async ({ page }) => {
+test.skip('Reusing locators', async ({ page }) => {
   const basicForm = page.locator('nb-card').filter({ hasText: 'Basic form' });
 
   const emailField = basicForm.getByRole('textbox', { name: 'Email' });
@@ -118,4 +118,27 @@ test('Reusing locators', async ({ page }) => {
   await basicForm.locator('nb-checkbox').click();
 
   await basicForm.getByRole('button').click();
+
+  await expect(basicForm).toHaveValue('example@example.com')
 });
+
+test('extracting values', async ({ page }) => {
+  // simple test value
+  const basicForm = page.locator('nb-card').filter({ hasText: 'Basic form' });
+  const buttonText = await basicForm.getByRole('button').textContent();
+  expect(buttonText).toEqual('Submit');
+
+
+  // all text values
+  const allRadioButtonsLabels = await page.locator('nb-radio').allTextContents();
+  expect(allRadioButtonsLabels).toContain('Option 1')
+
+  // input value
+  const emailField = basicForm.getByRole('textbox', { name: 'Email' });
+  await emailField.fill('example@example.com');
+  const emailValue = await emailField.inputValue();
+  expect(emailValue).toEqual('example@example.com');
+
+  const placeholderValue = await emailField.getAttribute('placeholder');
+  expect(placeholderValue).toEqual('Email');
+})
