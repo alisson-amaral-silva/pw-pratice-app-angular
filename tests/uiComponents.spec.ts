@@ -86,21 +86,42 @@ test('list and dropdown', async ({ page }) => {
   const optionList = page.locator('nb-option-list nb-option');
   await expect(optionList).toHaveText(['Light', 'Dark', 'Cosmic', 'Corporate']);
 
-  await optionList.filter({hasText: 'Cosmic'}).click()
+  await optionList.filter({ hasText: 'Cosmic' }).click();
 
   const header = page.locator('nb-layout-header');
-  await expect(header).toHaveCSS('background-color','rgb(50, 50, 89)')
+  await expect(header).toHaveCSS('background-color', 'rgb(50, 50, 89)');
 });
 
-
-test('tooltips', async ({page}) => {
+test('tooltips', async ({ page }) => {
   await page.getByText('Modal & Overlays').click();
   await page.getByText('Tooltip').click();
 
-  const tooltipCard = page.locator('nb-card',{hasText: 'Tooltip Placements'});
-  await tooltipCard.getByRole('button', {name: 'Top'}).hover()
+  const tooltipCard = page.locator('nb-card', {
+    hasText: 'Tooltip Placements',
+  });
+  await tooltipCard.getByRole('button', { name: 'Top' }).hover();
 
-  page.getByRole('tooltip') //if you have a role tooltip created
-  const tooltip = await page.locator("nb-tooltip").textContent();
+  page.getByRole('tooltip'); //if you have a role tooltip created
+  const tooltip = await page.locator('nb-tooltip').textContent();
   expect(tooltip).toEqual('This is a tooltip');
-})
+});
+
+test('dialogs', async ({ page }) => {
+  await page.getByText('Tables & Data').click();
+  await page.getByText('Smart Table').click();
+
+  page.on('dialog', (dialog) => {
+    expect(dialog.message()).toEqual('Are you sure you want to delete?');
+    dialog.accept();
+  });
+
+  await page
+    .getByRole('table')
+    .locator('tr', { hasText: 'mdo@gmail.com' })
+    .locator('.nb-trash')
+    .click();
+
+  await expect(page.locator('table tr').first()).not.toHaveText(
+    'mdo@gmail.com',
+  );
+});
