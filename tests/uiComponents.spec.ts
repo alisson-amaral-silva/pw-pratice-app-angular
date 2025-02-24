@@ -68,10 +68,26 @@ test('checkboxes', async ({ page }) => {
     .getByRole('checkbox', { name: 'Prevent arising of duplicate toast' })
     .check({ force: true });
 
-
-  const allBoxes = page.getByRole('checkbox')
+  const allBoxes = page.getByRole('checkbox');
   for (const box of await allBoxes.all()) {
     await box.uncheck({ force: true });
     expect(await box.isChecked()).toBeFalsy();
   }
+});
+
+test('list and dropdown', async ({ page }) => {
+  const dropdownMenu = page.locator('ngx-header nb-select');
+  await dropdownMenu.click();
+
+  page.getByRole('list');
+  page.getByRole('listitem');
+
+  // const optionList = page.getByRole('list').locator('nb-option')
+  const optionList = page.locator('nb-option-list nb-option');
+  await expect(optionList).toHaveText(['Light', 'Dark', 'Cosmic', 'Corporate']);
+
+  await optionList.filter({hasText: 'Cosmic'}).click()
+
+  const header = page.locator('nb-layout-header');
+  await expect(header).toHaveCSS('background-color','rgb(50, 50, 89)')
 });
