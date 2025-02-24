@@ -4,17 +4,17 @@ test.beforeEach(async ({ page }) => {
   await page.goto('http://localhost:4200');
 });
 
-
-test.describe("Form Layouts page", () => {
-
+test.describe('Form Layouts page', () => {
   test.beforeEach(async ({ page }) => {
     await page.getByText('Forms').click();
     await page.getByText('Form Layouts').click();
   });
 
-  test('basic form', async ({ page }) => {
-    const basicForm = page.locator('nb-card').filter({ hasText: 'Using the Grid' });
-    const inputEmail = basicForm.getByRole('textbox',{name: 'Email'});
+  test('input fields', async ({ page }) => {
+    const basicForm = page
+      .locator('nb-card')
+      .filter({ hasText: 'Using the Grid' });
+    const inputEmail = basicForm.getByRole('textbox', { name: 'Email' });
 
     await inputEmail.fill('example@example.com');
 
@@ -25,4 +25,33 @@ test.describe("Form Layouts page", () => {
     // locator assertion
     await expect(inputEmail).toHaveValue('example@example.com');
   });
-})
+
+  test('radio buttons', async ({ page }) => {
+    const basicForm = page
+      .locator('nb-card')
+      .filter({ hasText: 'Using the Grid' });
+
+    // await basicForm.getByLabel('Option 1').check({ force: true });
+    await basicForm
+      .getByRole('radio', { name: 'Option 1' })
+      .check({ force: true });
+
+    const radioStatus = await basicForm
+      .getByRole('radio', { name: 'Option 1' })
+      .isChecked();
+
+    expect(radioStatus).toBeTruthy();
+
+    await expect(
+      basicForm.getByRole('radio', { name: 'Option 1' }),
+    ).toBeChecked();
+
+    await basicForm
+      .getByRole('radio', { name: 'Option 2' })
+      .check({ force: true });
+
+    await expect(
+      basicForm.getByRole('radio', { name: 'Option 1' }),
+    ).not.toBeChecked();
+  });
+});
