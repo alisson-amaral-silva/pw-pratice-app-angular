@@ -1,42 +1,39 @@
 import test from '@playwright/test';
-import { NavigationPage } from '../page-objects/navigationPage';
-import { FormLayoutsPage } from '../page-objects/formLayoutsPage';
-import { DatePickerPage } from '../page-objects/datepickerPage';
+import { PageManager } from '../page-objects/pageManager';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('http://localhost:4200');
 });
 
 test('navigate to form page', async ({ page }) => {
-  const navigateTo = new NavigationPage(page);
-  await navigateTo.formLayoutsPage();
-  await navigateTo.datePickerPage();
-  await navigateTo.smartTablePage();
-  await navigateTo.toastrPage();
-  await navigateTo.tooltipPage();
+  const pm = new PageManager(page)
+
+  await pm.navigateTo().formLayoutsPage();
+  await pm.navigateTo().datePickerPage();
+  await pm.navigateTo().smartTablePage();
+  await pm.navigateTo().toastrPage();
+  await pm.navigateTo().tooltipPage();
 });
 
 test('parametrized methods', async ({ page }) => {
-  const navigateTo = new NavigationPage(page);
-  const formLayoutsPage = new FormLayoutsPage(page);
-  const onDatepickerPage = new DatePickerPage(page);
+  const pm = new PageManager(page)
 
-  await navigateTo.formLayoutsPage();
-  await formLayoutsPage.submitUsingTheGridFormWithCredentialsAndSelectOption(
+  await pm.navigateTo().formLayoutsPage();
+  await pm.onFormLayoutsPage().submitUsingTheGridFormWithCredentialsAndSelectOption(
     'email@email.com',
     'M1234',
     'Option 1',
   );
 
-  await formLayoutsPage.submitInlineFormWithNameEmailAndCheckbox(
+  await pm.onFormLayoutsPage().submitInlineFormWithNameEmailAndCheckbox(
     'John Doe',
     'johndoe@example.com',
     true,
   );
 
-  await navigateTo.datePickerPage();
+  await pm.navigateTo().datePickerPage();
 
-  await onDatepickerPage.selectCommonDatePickerDateFromToday(1);
+  await pm.onDatePickerPage().selectCommonDatePickerDateFromToday(1);
 
-  await onDatepickerPage.selectDatepickerWithRangeFromToday(1, 2);
+  await pm.onDatePickerPage().selectDatepickerWithRangeFromToday(1, 2);
 });
